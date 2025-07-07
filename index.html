@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Career Counselor</title>
+  <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e3f2fd, #e1bee7);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,255,255,0.3), transparent);
+      border-radius: 50%;
+      z-index: 0;
+      animation: float 10s ease-in-out infinite alternate;
+    }
+
+    body::before { top: -100px; left: -100px; }
+    body::after { bottom: -150px; right: -150px; animation-delay: 5s; }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0); }
+      100% { transform: translateY(20px) rotate(360deg); }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      color: #3f51b5;
+      margin-bottom: 1rem;
+    }
+
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    .question {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0;
+      text-align: left;
+      font-size: 1rem;
+      color: #444;
+    }
+
+    button {
+      background: #3f51b5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #303f9f;
+    }
+
+    #resultBox {
+      display: none;
+      padding: 1rem;
+      background: #e8f5e9;
+      border: 2px solid #81c784;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    #downloadBtn {
+      display: none;
+      margin-top: 10px;
+    }
+
+    #chatbot-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #3f51b5;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 20px;
+      z-index: 999;
+      animation: popup 0.5s ease-in-out;
+    }
+
+    @keyframes popup {
+      from {opacity: 0; transform: translate(-50%, -20px);}
+      to {opacity: 1; transform: translate(-50%, 0);}
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chatbot-popup">
+  👋 Hello! I'm Ava, your Career Guide. Let's find your ideal career! 🎯
+</div>
+
+<div class="container">
+  <h1>AI Career Counselor</h1>
+  <form id="quizForm">
+    <div class="step active">
+      <div class="question">1. What field interests you the most?</div>
+      <label><input type="radio" name="q1" value="tech"> Technology</label>
+      <label><input type="radio" name="q1" value="art"> Arts</label>
+      <label><input type="radio" name="q1" value="science"> Science</label>
+      <label><input type="radio" name="q1" value="people"> People</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">2. What activities do you enjoy?</div>
+      <label><input type="checkbox" name="q2" value="coding"> Coding</label>
+      <label><input type="checkbox" name="q2" value="design"> Designing</label>
+      <label><input type="checkbox" name="q2" value="research"> Research</label>
+      <label><input type="checkbox" name="q2" value="management"> Management</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">3. Preferred work environment?</div>
+      <label><input type="radio" name="q3" value="office"> Office</label>
+      <label><input type="radio" name="q3" value="remote"> Remote</label>
+      <label><input type="radio" name="q3" value="field"> Field</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">4. Core Strength?</div>
+      <label><input type="radio" name="q4" value="creativity"> Creativity</label>
+      <label><input type="radio" name="q4" value="analysis"> Analytical Thinking</label>
+      <label><input type="radio" name="q4" value="teamwork"> Teamwork</label>
+      <label><input type="radio" name="q4" value="leadership"> Leadership</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">5. What sounds most appealing?</div>
+      <label><input type="radio" name="q5" value="app"> Building an App</label>
+      <label><input type="radio" name="q5" value="art"> Creating Art</label>
+      <label><input type="radio" name="q5" value="research"> Solving a Mystery</label>
+      <label><input type="radio" name="q5" value="team"> Leading a Team</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">6. Prefer working solo or in a team?</div>
+      <label><input type="radio" name="q6" value="solo"> Solo</label>
+      <label><input type="radio" name="q6" value="team"> Team</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">7. What motivates you most?</div>
+      <label><input type="radio" name="q7" value="impact"> Making an Impact</label>
+      <label><input type="radio" name="q7" value="money"> High Income</label>
+      <label><input type="radio" name="q7" value="curiosity"> Curiosity</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">8. Which subject did you enjoy in school?</div>
+      <label><input type="radio" name="q8" value="math"> Math</label>
+      <label><input type="radio" name="q8" value="bio"> Biology</label>
+      <label><input type="radio" name="q8" value="lit"> Literature</label>
+      <label><input type="radio" name="q8" value="business"> Business</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">9. Which do you prefer?</div>
+      <label><input type="radio" name="q9" value="start"> Starting your own business</label>
+      <label><input type="radio" name="q9" value="join"> Joining a stable company</label>
+      <button type="button" onclick="nextStep()">Next</button>
+    </div>
+
+    <div class="step">
+      <div class="question">10. Which career do you admire?</div>
+      <label><input type="radio" name="q10" value="engineer"> Engineer</label>
+      <label><input type="radio" name="q10" value="doctor"> Doctor</label>
+      <label><input type="radio" name="q10" value="artist"> Artist</label>
+      <label><input type="radio" name="q10" value="manager"> Manager</label>
+      <button type="button" onclick="showResult()">Get My Career Suggestion</button>
+    </div>
+  </form>
+
+  <div id="resultBox"></div>
+  <button id="downloadBtn" onclick="downloadPDF()">Download as PDF</button>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+  let currentStep = 0;
+  const steps = document.querySelectorAll('.step');
+  function nextStep() {
+    steps[currentStep].classList.remove('active');
+    currentStep++;
+    steps[currentStep].classList.add('active');
+  }
+
+  function showResult() {
+    steps[currentStep].classList.remove('active');
+    const resultBox = document.getElementById("resultBox");
+    const career = "Software Developer";
+    const salary = "₹8 - ₹15 LPA";
+    resultBox.innerHTML = `
+      <h3>🎓 Suggested Career Path: ${career}</h3>
+      <p>💼 Average Salary: ${salary}</p>
+      <p>📌 Because you enjoy tech, coding, and analytical tasks!</p>
+    `;
+    resultBox.style.display = "block";
+    document.getElementById("downloadBtn").style.display = "inline-block";
+
+    // Confetti
+    const confettiSettings = { target: 'confetti-canvas' };
+    const confetti = new ConfettiGenerator(confettiSettings);
+    confetti.render();
+  }
+
+  function downloadPDF() {
+    const element = document.getElementById("resultBox");
+    html2pdf().from(element).save("Career_Result.pdf");
+  }
+
+  setTimeout(() => {
+    document.getElementById("chatbot-popup").style.display = "none";
+  }, 4000);
+</script>
+
+</body>
+</html>
